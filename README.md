@@ -17,7 +17,7 @@ Download the installer from the releases tab and run
 Run Auto Shutdown and input your license key in the dialog box
 
 ### Navigating the UI
-![UI](https://i.imgur.com/0azYzAp.png)
+![UI](https://i.imgur.com/IAEXKbd.png)
 
 #### 1: Time selector
 Select how long before loadshedding starts that you would like to shut down the system or input a custom value (minutes)
