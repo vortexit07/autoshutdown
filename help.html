@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help File Template</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff;
+        }
+        
+        p {
+            line-height: 1.6;
+        }
+        
+        code {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Auto Shutdown Help Documentation</h1>
+        <br>
+
+        
+        <h2>Getting a License Key</h2>
+        <p>1. Go to the EskomSePush API page on Gumroad (or click <a href="https://eskomsepush.gumroad.com/l/api" target="_blank">here</a>
+            ) </p>
+        
+        <p>2. Make sure that the free plan is selected on thr right</p>
+        <p>3. Click "Subscribe" and proceed with the purchase (you will not be charged)</p>
+        <p>4. On the next screen, copy your license key (should look something like <code>XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX</code>)</p>
+        <br>
+
+        <h2>Usage</h2>
+        <p>Run Auto Shutdown and input your license key in the dialog box</p>
+        
+        
+        <h3>Navigating the UI</h3>
+        <img src="https://i.imgur.com/E9BbJgS.png" style="max-width: 50%; height: auto;">
+        <br>
+    
+
+        
+        <h2>Error Codes</h2>
+        <p>Explanation of error codes (hopefully you don't get any)</p>
+
+        <table border="2" style="border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; font-weight: bold;">Error Code</td>
+                <td style="padding: 10px; font-weight: bold;">Meaning</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;">403</td>
+                <td style="padding: 10px;">Not Authenticated (Token Invalid / Disabled)</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;">404</td>
+                <td style="padding: 10px;">Not Found</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;">408</td>
+                <td style="padding: 10px;">Request Timeout (try again later)</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;">429</td>
+                <td style="padding: 10px;">Too Many Requests (Token quota exceeded)</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;">5xx</td>
+                <td style="padding: 10px;">Server side issue</td>
+            </tr>
+        </table>
+        
+        
+        
+    </div>
+</body>
+</html>
