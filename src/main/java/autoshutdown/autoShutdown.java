@@ -79,13 +79,6 @@ public class autoShutdown {
       getData();
     }
 
-    // parsedStart = LocalTime.parse("00:00", formatter);
-    // parsedEnd = LocalTime.parse("23:59", formatter);
-    // parsedTime1 = LocalTime.parse("22:00", formatter);
-    // parsedTime2 = LocalTime.parse("22:00", formatter);
-    // parsedTime3 = LocalTime.parse("22:00", formatter);
-    // parsedTime4 = LocalTime.parse("22:00", formatter);
-
     SwingUtilities.invokeLater(() -> {
       try {
         createAndShowGUI();
@@ -138,9 +131,10 @@ public class autoShutdown {
 
   }
 
+  // Check if the device has an internet connection
   static boolean isInternetAvailable() {
     try {
-      URI uri = new URI("https://www.google.com"); // Replace with any reliable website
+      URI uri = new URI("https://www.google.com");
       URL url = uri.toURL();
       URLConnection connection = url.openConnection();
       connection.connect();
@@ -1042,6 +1036,7 @@ public class autoShutdown {
     events.setBounds(557, 150, 213, 300);
   } // End of createAndShowGUI
 
+  // Enable "run on startup" by creating a shortcut in the "startup" folder to the appliaction executable
   private static void createStartupLink() {
 
     try {
@@ -1091,6 +1086,7 @@ public class autoShutdown {
   }
   }
 
+  // Delete "startup" folder link to disable "run on startup"
   static void deleteStartupLink() {
     String destinationDirectory = System.getenv("APPDATA")
         + "\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Auto Shutdown.lnk";
@@ -1232,6 +1228,7 @@ public class autoShutdown {
     }
   } // End of createData
 
+  // Create the config.json file
   public static void createConfig() {
     // Create a JSON object for the specified structure
     JSONObject configObject = new JSONObject();
