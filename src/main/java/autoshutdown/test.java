@@ -1,3 +1,5 @@
+// This file use for testing new features, don't expect what's in here to work
+
 package autoshutdown;
 
 import javax.swing.*;

@@ -14,8 +14,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,6 +31,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -53,7 +57,7 @@ public class autoShutdown {
   static boolean endAtMidnight = false;
   static LocalTime parsedTime1, parsedTime2, parsedTime3, parsedTime4, parsedStart, parsedEnd, parsedTime5;
   static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-  static ProcessBuilder shutdown = new ProcessBuilder("shutdown", "/s", "/t 0");
+  static ProcessBuilder shutdown = new ProcessBuilder("shutdown", "/s", "/t", "0");
   static ProcessBuilder copyStartup = new ProcessBuilder("cmd", "/c", "mklink", "/d",
       "%appdata%/Microsoft/Windows/Start Menu/Programs/Startup" + File.separator + "Auto Shutdown", "Auto Shutdown v*");
 
@@ -73,7 +77,6 @@ public class autoShutdown {
   public static void main(String[] args)
       throws IOException, UnirestException, InterruptedException, FileNotFoundException {
 
-    showNotification("Test", TOKEN);
 
     if (isInternetAvailable()) {
       getData();
@@ -92,7 +95,7 @@ public class autoShutdown {
     Thread.sleep(2000);
 
     if (!isInternetAvailable()) {
-      showNotification("No Internet", "No internet connection, using previously obtained times");
+      showNotification("Auto Shutdown", "No internet connection, using previously obtained times");
     }
 
     // Start the shutdown thread
@@ -523,6 +526,7 @@ public class autoShutdown {
 
     if (!configFile.exists()) {
       createConfig();
+
     } else {
       System.out.println("File already exists.");
     }
@@ -983,6 +987,71 @@ public class autoShutdown {
     helpButton.setMargin(new Insets(1, 0, 1, 1));
     helpButton.setHorizontalAlignment(SwingConstants.LEFT);
 
+    helpButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        JPopupMenu popupMenu = new JPopupMenu();
+
+        JMenuItem helpMenuItem = new JMenuItem("Help");
+        JMenuItem aboutMenuItem = new JMenuItem("About");
+
+        helpMenuItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            File helpFile = new File("help.html");
+            try {
+              Desktop.getDesktop().open(helpFile);
+            } catch (IOException e1) {
+              e1.printStackTrace();
+            }
+          }
+        });
+
+        aboutMenuItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            JDialog about = new JDialog(frame, "About", true);
+            about.setLayout(new GridBagLayout());
+            about.setSize(650, 400);
+            about.getContentPane().setBackground(backgroundColor);
+            about.getContentPane().setForeground(fontColor);
+
+            JLabel aboutLabel = new JLabel("About");
+            aboutLabel.setFont(new Font("Dialog", Font.BOLD, 24));
+            aboutLabel.setForeground(Color.WHITE);
+
+            // Constraints for "general" label
+            GridBagConstraints aboutLabelContstraints = new GridBagConstraints();
+            aboutLabelContstraints.gridx = 1;
+            aboutLabelContstraints.gridy = 1;
+            aboutLabelContstraints.weightx = 1.0;
+            aboutLabelContstraints.weighty = 1.0;
+            aboutLabelContstraints.anchor = GridBagConstraints.NORTHWEST;
+            aboutLabelContstraints.insets = new Insets(15, 20, 10, 10);
+
+            String version = extractProductVersion("Auto Shutdown v*.exe");
+            System.out.println(version);
+
+            about.add(aboutLabel, aboutLabelContstraints);
+
+            int x = frame.getX() + (frame.getWidth() / 2) - about.getWidth() / 2;
+            int y = frame.getY() + (frame.getHeight() / 2) - about.getHeight() / 2;
+            about.setLocation(x, y);
+            about.setResizable(false);
+            about.setVisible(true);
+
+          }
+        });
+
+        // Add menu items to the popup menu
+        popupMenu.add(helpMenuItem);
+        popupMenu.add(aboutMenuItem);
+
+        // Show the popup menu at the button's location
+        popupMenu.show(helpButton, 0, helpButton.getHeight());
+      }
+    });
+
     optionsBar.add(settingsButton);
     optionsBar.add(helpButton);
 
@@ -1036,30 +1105,55 @@ public class autoShutdown {
     events.setBounds(557, 150, 213, 300);
   } // End of createAndShowGUI
 
-  // Enable "run on startup" by creating a shortcut in the "startup" folder to the appliaction executable
+  private static String extractProductVersion(String pattern) {
+    try {
+      Path currentDir = Paths.get(""); // Current directory
+
+      PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+      Path file = Files.find(currentDir, 1, (path, attr) -> matcher.matches(path.getFileName()))
+          .findFirst()
+          .orElse(null);
+
+      try (JarFile jarFile = new JarFile(file.toFile())) {
+        Attributes attributes = jarFile.getManifest().getMainAttributes();
+        return attributes.getValue("product_version") + "";
+      } catch (IOException | NullPointerException e) {
+        System.err.println("Error reading file: " + file.getFileName() + " - " + e.getMessage());
+      }
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return "deez";
+
+  }
+
+  // Enable "run on startup" by creating a shortcut in the "startup" folder to the
+  // appliaction executable
   private static void createStartupLink() {
 
     try {
       String scriptContent = "@echo off\n"
-              + "set \"targetFile=Auto Shutdown v*.exe\"\n"
-              + "set \"shortcutName=Auto Shutdown.lnk\"\n"
-              + "set \"startupFolder=%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\"\n"
-              + "\n"
-              + "for %%F in (\"%targetFile%\") do (\n"
-              + "    set \"targetFilePath=%%~fF\"\n"
-              + "    set \"targetFileName=%%~nxF\"\n"
-              + ")\n"
-              + "\n"
-              + "set \"shortcutTarget=%startupFolder%\\%shortcutName%\"\n"
-              + "\n"
-              + "echo Creating shortcut...\n"
-              + "echo Target File: %targetFileName%\n"
-              + "echo Startup Folder: %startupFolder%\n"
-              + "echo Shortcut Target: %shortcutTarget%\n"
-              + "\n"
-              + "powershell -Command \"$WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%shortcutTarget%'); $Shortcut.TargetPath = '%targetFilePath%'; $Shortcut.Save()\"\n"
-              + "\n"
-              + "echo Shortcut created at %shortcutTarget%\n";
+          + "set \"targetFile=Auto Shutdown v*.exe\"\n"
+          + "set \"shortcutName=Auto Shutdown.lnk\"\n"
+          + "set \"startupFolder=%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\"\n"
+          + "\n"
+          + "for %%F in (\"%targetFile%\") do (\n"
+          + "    set \"targetFilePath=%%~fF\"\n"
+          + "    set \"targetFileName=%%~nxF\"\n"
+          + ")\n"
+          + "\n"
+          + "set \"shortcutTarget=%startupFolder%\\%shortcutName%\"\n"
+          + "\n"
+          + "echo Creating shortcut...\n"
+          + "echo Target File: %targetFileName%\n"
+          + "echo Startup Folder: %startupFolder%\n"
+          + "echo Shortcut Target: %shortcutTarget%\n"
+          + "\n"
+          + "powershell -Command \"$WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%shortcutTarget%'); $Shortcut.TargetPath = '%targetFilePath%'; $Shortcut.Save()\"\n"
+          + "\n"
+          + "echo Shortcut created at %shortcutTarget%\n";
 
       // Create a temporary batch file
       File tempBatchFile = File.createTempFile("createShortcut", ".bat");
@@ -1074,16 +1168,16 @@ public class autoShutdown {
       int exitCode = process.waitFor();
 
       if (exitCode == 0) {
-          System.out.println("Shortcut created successfully.");
+        System.out.println("Shortcut created successfully.");
       } else {
-          System.out.println("Failed to create shortcut. Exit code: " + exitCode);
+        System.out.println("Failed to create shortcut. Exit code: " + exitCode);
       }
 
       // Clean up the temporary batch file
       tempBatchFile.delete();
-  } catch (IOException | InterruptedException e) {
+    } catch (IOException | InterruptedException e) {
       e.printStackTrace();
-  }
+    }
   }
 
   // Delete "startup" folder link to disable "run on startup"
