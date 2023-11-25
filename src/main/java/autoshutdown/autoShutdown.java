@@ -14,10 +14,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,8 +29,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -44,6 +40,8 @@ import java.awt.event.*;
 public class autoShutdown {
 
   static boolean testing = false;
+
+  static String versionInfo = "<html>Name:\tAuto Shutdown v2.3 <br>Version:\t2.3.2 <br>Updated:\t25/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
 
   // Static variables
   static boolean running = true, loadshedding = true;
@@ -77,7 +75,6 @@ public class autoShutdown {
   public static void main(String[] args)
       throws IOException, UnirestException, InterruptedException, FileNotFoundException {
 
-
     if (isInternetAvailable()) {
       getData();
     }
@@ -88,6 +85,8 @@ public class autoShutdown {
       } catch (FileNotFoundException e) {
         e.printStackTrace();
       } catch (AWTException e) {
+        e.printStackTrace();
+      } catch (InterruptedException e) {
         e.printStackTrace();
       }
     });
@@ -433,7 +432,7 @@ public class autoShutdown {
   static JLabel event5Label = new JLabel("");
   static String event1 = "", event2 = "", event3 = "", event4 = "", event5 = "";
 
-  // Update GUI with new getData() values
+  // Update GUI with time values in "times.json"
   public static void updateGUI() throws FileNotFoundException {
 
     FileReader timesReader = new FileReader("times.json");
@@ -447,23 +446,11 @@ public class autoShutdown {
 
     stage = stageArray.getJSONObject(0).getInt("level");
 
-    if (timesArray.getJSONObject(0).get("time1") != null) {
-      time[0] = timesArray.getJSONObject(0).get("time1").toString();
-    }
-    if (timesArray.getJSONObject(0).get("time2") != null) {
-      time[1] = timesArray.getJSONObject(0).get("time2").toString();
-    }
-    if (timesArray.getJSONObject(0).get("time3") != null) {
-      time[2] = timesArray.getJSONObject(0).get("time3").toString();
-    }
-    if (timesArray.getJSONObject(0).get("time4") != null) {
-      time[3] = timesArray.getJSONObject(0).get("time4").toString();
-    }
-    if (timesArray.getJSONObject(0).get("time5") != null) {
-      time[4] = timesArray.getJSONObject(0).get("time5").toString();
-    }
-
-    System.out.println("Stage: " + stage);
+    time[0] = timesArray.getJSONObject(0).get("time1").toString();
+    time[1] = timesArray.getJSONObject(0).get("time2").toString();
+    time[2] = timesArray.getJSONObject(0).get("time3").toString();
+    time[3] = timesArray.getJSONObject(0).get("time4").toString();
+    time[4] = timesArray.getJSONObject(0).get("time5").toString();
 
     LocalTime now = LocalTime.now();
     now = LocalTime.parse(("" + now).substring(0, 5), formatter);
@@ -512,7 +499,7 @@ public class autoShutdown {
   }
 
   // Show the main GUI
-  public static void createAndShowGUI() throws FileNotFoundException, AWTException {
+  public static void createAndShowGUI() throws FileNotFoundException, AWTException, InterruptedException {
 
     boolean startMinimized = true;
 
@@ -848,7 +835,7 @@ public class autoShutdown {
 
         String fileName = "config.json";
 
-        // Constraints for the button
+        // Constraints for the save button
         GridBagConstraints buttonConstraints = new GridBagConstraints();
         buttonConstraints.gridx = 1;
         buttonConstraints.gridy = 1;
@@ -857,7 +844,7 @@ public class autoShutdown {
         buttonConstraints.anchor = GridBagConstraints.SOUTHEAST;
         buttonConstraints.insets = new Insets(10, 10, 10, 10);
 
-        // Add a button to the dialog
+        // Add save button to the dialog
         JButton saveButton = new JButton("Save");
         saveButton.setBackground(accentColor);
         saveButton.setForeground(Color.WHITE);
@@ -900,7 +887,7 @@ public class autoShutdown {
         startBehaviour.setBorderPainted(false);
         startBehaviour.setFocusPainted(false);
 
-        // Constraints for startup check box
+        // Constraints for startup behaivour check box
         GridBagConstraints startBehaviourConstraints = new GridBagConstraints();
         startBehaviourConstraints.gridx = 1;
         startBehaviourConstraints.gridy = 1;
@@ -978,7 +965,6 @@ public class autoShutdown {
 
     });
 
-    // TODO Finish help button
     JButton helpButton = new JButton("Help");
     helpButton.setForeground(fontColor);
     helpButton.setBackground(Color.WHITE);
@@ -1029,10 +1015,46 @@ public class autoShutdown {
             aboutLabelContstraints.anchor = GridBagConstraints.NORTHWEST;
             aboutLabelContstraints.insets = new Insets(15, 20, 10, 10);
 
-            String version = extractProductVersion("Auto Shutdown v*.exe");
-            System.out.println(version);
+            JLabel infoLabel = new JLabel(versionInfo);
+            infoLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+            infoLabel.setForeground(Color.LIGHT_GRAY);
+
+            // Constraints for "info" label
+            GridBagConstraints infoLabelConstraints = new GridBagConstraints();
+            infoLabelConstraints.gridx = 1;
+            infoLabelConstraints.gridy = 1;
+            aboutLabelContstraints.weightx = 1.0;
+            infoLabelConstraints.weighty = 1.0;
+            infoLabelConstraints.anchor = GridBagConstraints.NORTHWEST;
+            infoLabelConstraints.insets = new Insets(50, 20, 10, 10);
+
+            JButton hyperlinkButton = new JButton();
+            hyperlinkButton.setUI(new BasicButtonUI());
+            hyperlinkButton.setOpaque(false);
+
+            GridBagConstraints hyperlinkButtonConstraints = new GridBagConstraints();
+            hyperlinkButtonConstraints.gridx = 1;
+            hyperlinkButtonConstraints.gridy = 1;
+            hyperlinkButtonConstraints.weightx = 1.0;
+            hyperlinkButtonConstraints.weighty = 1.0;
+            hyperlinkButtonConstraints.anchor = GridBagConstraints.NORTHWEST;
+            hyperlinkButtonConstraints.insets = new Insets(151, 85, 10, 10);
+
+            hyperlinkButton.setPreferredSize(new Dimension(200, 22));
+            hyperlinkButton.setFocusPainted(false);
+            hyperlinkButton.setBorderPainted(false);
+            hyperlinkButton.setBorder(BorderFactory.createEmptyBorder());
+
+            hyperlinkButton.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                openLink("github.com/vortexit07/autoshutdown");
+              }
+            });
 
             about.add(aboutLabel, aboutLabelContstraints);
+            about.add(infoLabel, infoLabelConstraints);
+            about.add(hyperlinkButton, hyperlinkButtonConstraints);
 
             int x = frame.getX() + (frame.getWidth() / 2) - about.getWidth() / 2;
             int y = frame.getY() + (frame.getHeight() / 2) - about.getHeight() / 2;
@@ -1090,6 +1112,12 @@ public class autoShutdown {
     events.add(event4Label);
     events.add(event5Label);
 
+    dropdownButton.setBounds(7, 20, 110, 20);
+    toggleButton.setBounds((frame.getWidth() / 2) - imgW / 2, 150, imgW, imgH);
+    areaIDButton.setBounds((frame.getWidth() / 2) - 150, 250, 300, 50);
+    optionsBar.setBounds(-3, -8, 800, 27);
+    events.setBounds(557, 150, 213, 300);
+
     frame.add(dropdownButton);
     frame.add(areaIDButton);
     frame.add(toggleButton);
@@ -1097,36 +1125,20 @@ public class autoShutdown {
     frame.add(optionsBar);
     frame.setVisible(startMinimized);
     frame.setResizable(false);
-
-    dropdownButton.setBounds(7, 20, 110, 20);
-    toggleButton.setBounds((frame.getWidth() / 2) - imgW / 2, 150, imgW, imgH);
-    areaIDButton.setBounds((frame.getWidth() / 2) - 150, 250, 300, 50);
-    optionsBar.setBounds(-3, -8, 800, 27);
-    events.setBounds(557, 150, 213, 300);
   } // End of createAndShowGUI
 
-  private static String extractProductVersion(String pattern) {
-    try {
-      Path currentDir = Paths.get(""); // Current directory
-
-      PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
-      Path file = Files.find(currentDir, 1, (path, attr) -> matcher.matches(path.getFileName()))
-          .findFirst()
-          .orElse(null);
-
-      try (JarFile jarFile = new JarFile(file.toFile())) {
-        Attributes attributes = jarFile.getManifest().getMainAttributes();
-        return attributes.getValue("product_version") + "";
-      } catch (IOException | NullPointerException e) {
-        System.err.println("Error reading file: " + file.getFileName() + " - " + e.getMessage());
+  static void openLink(String url) {
+    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+      try {
+        URI uri = new URI("http://" + url);
+        Desktop.getDesktop().browse(uri);
+      } catch (IOException | URISyntaxException e) {
+        e.printStackTrace();
       }
-
-    } catch (IOException e) {
-      e.printStackTrace();
+    } else {
+      System.out.println("Opening links is not supported on this platform");
+      // You can handle this case accordingly for your application
     }
-
-    return "deez";
-
   }
 
   // Enable "run on startup" by creating a shortcut in the "startup" folder to the
