@@ -41,7 +41,7 @@ public class autoShutdown {
 
   static boolean testing = false;
 
-  static String versionInfo = "<html>Name:\tAuto Shutdown v2.3 <br>Version:\t2.3.2 <br>Updated:\t25/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
+  static String versionInfo = "<html>Name:\tAuto Shutdown v2.3 <br>Version:\t2.3.3 <br>Updated:\t26/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
 
   // Static variables
   static boolean running = true, loadshedding = true;
@@ -355,6 +355,24 @@ public class autoShutdown {
       timeBefore = config.getInt("timeBefore");
 
       reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+     try {
+      FileReader timesReader = new FileReader("times.json");
+      JSONTokener timesTokener = new JSONTokener(timesReader);
+      JSONObject timesJSON = new JSONObject(timesTokener);
+
+      JSONArray times = timesJSON.getJSONArray("times");
+
+      parsedTime1 = !times.getJSONObject(0).get("time1").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time1").toString(), formatter) : null;
+      parsedTime2 = !times.getJSONObject(0).get("time2").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time2").toString(), formatter) : null;
+      parsedTime3 = !times.getJSONObject(0).get("time3").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time3").toString(), formatter) : null;
+      parsedTime4 = !times.getJSONObject(0).get("time4").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time4").toString(), formatter) : null;
+      parsedTime5 = !times.getJSONObject(0).get("time5").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time5").toString(), formatter) : null;
+
+      timesReader.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
