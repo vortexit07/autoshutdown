@@ -41,7 +41,7 @@ public class autoShutdown {
 
   static boolean testing = false;
 
-  static String versionInfo = "<html>Name:\tAuto Shutdown v2.3 <br>Version:\t2.3.3 <br>Updated:\t26/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
+  static String versionInfo = "<html>Name:\tAuto Shutdown v2.3 <br>Version:\t2.3.4 <br>Updated:\t28/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
 
   // Static variables
   static boolean running = true, loadshedding = true;
@@ -359,18 +359,28 @@ public class autoShutdown {
       e.printStackTrace();
     }
 
-     try {
+    try {
       FileReader timesReader = new FileReader("times.json");
       JSONTokener timesTokener = new JSONTokener(timesReader);
       JSONObject timesJSON = new JSONObject(timesTokener);
 
       JSONArray times = timesJSON.getJSONArray("times");
 
-      parsedTime1 = !times.getJSONObject(0).get("time1").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time1").toString(), formatter) : null;
-      parsedTime2 = !times.getJSONObject(0).get("time2").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time2").toString(), formatter) : null;
-      parsedTime3 = !times.getJSONObject(0).get("time3").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time3").toString(), formatter) : null;
-      parsedTime4 = !times.getJSONObject(0).get("time4").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time4").toString(), formatter) : null;
-      parsedTime5 = !times.getJSONObject(0).get("time5").toString().isBlank() ? LocalTime.parse(times.getJSONObject(0).get("time5").toString(), formatter) : null;
+      parsedTime1 = !times.getJSONObject(0).get("time1").toString().isBlank()
+          ? LocalTime.parse(times.getJSONObject(0).get("time1").toString(), formatter)
+          : null;
+      parsedTime2 = !times.getJSONObject(0).get("time2").toString().isBlank()
+          ? LocalTime.parse(times.getJSONObject(0).get("time2").toString(), formatter)
+          : null;
+      parsedTime3 = !times.getJSONObject(0).get("time3").toString().isBlank()
+          ? LocalTime.parse(times.getJSONObject(0).get("time3").toString(), formatter)
+          : null;
+      parsedTime4 = !times.getJSONObject(0).get("time4").toString().isBlank()
+          ? LocalTime.parse(times.getJSONObject(0).get("time4").toString(), formatter)
+          : null;
+      parsedTime5 = !times.getJSONObject(0).get("time5").toString().isBlank()
+          ? LocalTime.parse(times.getJSONObject(0).get("time5").toString(), formatter)
+          : null;
 
       timesReader.close();
     } catch (IOException e) {
@@ -429,16 +439,18 @@ public class autoShutdown {
         || (parsedTime2 != null && now.equals(parsedTime2.minusMinutes(55)))
         || (parsedTime3 != null && now.equals(parsedTime3.minusMinutes(55)))
         || (parsedTime4 != null && now.equals(parsedTime4.minusMinutes(55)))
-        || (parsedTime5 != null && now.equals(parsedTime5.minusMinutes(55)))) {
+        || (parsedTime5 != null && now.equals(beforeMidnight.minusMinutes(55)))) {
       showNotification("Loadshedding soon", "Loadshedding in 55 minutes");
+      Thread.sleep(60500);
     }
 
     if ((parsedTime1 != null && now.equals(parsedTime1.minusMinutes(15)))
         || (parsedTime2 != null && now.equals(parsedTime2.minusMinutes(15)))
         || (parsedTime3 != null && now.equals(parsedTime3.minusMinutes(15)))
         || (parsedTime4 != null && now.equals(parsedTime4.minusMinutes(15)))
-        || (parsedTime5 != null && now.equals(parsedTime5.minusMinutes(14)))) {
+        || (parsedTime5 != null && now.equals(beforeMidnight.minusMinutes(14)))) {
       showNotification("Loadshedding soon", "Loadshedding in 15 minutes");
+      Thread.sleep(60500);
     }
 
   }
@@ -1003,10 +1015,14 @@ public class autoShutdown {
           @Override
           public void actionPerformed(ActionEvent e) {
             File helpFile = new File("help.html");
-            try {
-              Desktop.getDesktop().open(helpFile);
-            } catch (IOException e1) {
-              e1.printStackTrace();
+            if (isInternetAvailable()) {
+              openLink("sites.google.com/view/auto-shutdown/help-documentation");
+            } else {
+              try {
+                Desktop.getDesktop().open(helpFile);
+              } catch (IOException e1) {
+                e1.printStackTrace();
+              }
             }
           }
         });
