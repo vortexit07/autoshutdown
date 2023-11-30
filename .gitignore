@@ -1,3 +1,4 @@
 *.json
 src/main/java/autoshutdown/test.java
 target/classes/autoshutdown/test.class
+*.log
