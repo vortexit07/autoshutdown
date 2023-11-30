@@ -42,7 +42,7 @@ public class autoShutdown {
 
   static boolean testing = false;
 
-  static String versionInfo = "<html>Name:\tAuto Shutdown v2.3 <br>Version:\t2.3.5 <br>Updated:\t30/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
+  static String versionInfo = "<html>Name:\tAuto Shutdown v2.4 <br>Version:\t2.4 <br>Updated:\t30/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
 
   // Static variables
   static boolean running = true, loadshedding = true;
