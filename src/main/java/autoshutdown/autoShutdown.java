@@ -42,7 +42,7 @@ public class autoShutdown {
 
   static boolean testing = false;
 
-  static String versionInfo = "<html>Name:\tAuto Shutdown v2.4 <br>Version:\t2.4 <br>Updated:\t30/11/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
+  static String versionInfo = "<html>Name:\tAuto Shutdown v2.5 <br>Version:\t2.5 <br>Updated:\t17/12/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
 
   // Static variables
   static boolean running = true, loadshedding = true;
@@ -75,13 +75,17 @@ public class autoShutdown {
   static Color highlightColor = fontColor;
 
   public static void main(String[] args) {
+
+    createLog();
+
     try {
       if (isInternetAvailable()) {
         getData();
       }
 
       os = getOS();
-      createLog();
+
+      deleteLog();
 
       SwingUtilities.invokeLater(() -> {
         createAndShowGUI();
@@ -134,6 +138,10 @@ public class autoShutdown {
     }
   }
 
+  private static void deleteLog() {
+
+  }
+
   // Check if the device has an internet connection
   static boolean isInternetAvailable() {
     try {
@@ -158,16 +166,16 @@ public class autoShutdown {
       File dataFile = new File(fileName);
 
       if (dataFile.exists()) {
-        System.out.println("File " + fileName + " exists.");
+        log("" + "File " + fileName + " exists.");
       } else {
-        System.out.println("File " + fileName + " does not exist. Creating it...");
+        log("" + "File " + fileName + " does not exist. Creating it...");
         try {
           boolean created = dataFile.createNewFile();
           if (created) {
-            System.out.println("File " + fileName + " created successfully.");
+            log("" + "File " + fileName + " created successfully.");
             createData();
           } else {
-            System.out.println("Failed to create file " + fileName);
+            log("" + "Failed to create file " + fileName);
           }
         } catch (IOException e) {
           e.printStackTrace();
@@ -179,16 +187,16 @@ public class autoShutdown {
       File timesFile = new File(timesFileName);
 
       if (timesFile.exists()) {
-        System.out.println("File " + timesFile + " exists.");
+        log("" + "File " + timesFile + " exists.");
       } else {
-        System.out.println("File " + timesFile + " does not exist. Creating it...");
+        log("" + "File " + timesFile + " does not exist. Creating it...");
         try {
           boolean created = timesFile.createNewFile();
           if (created) {
-            System.out.println("File " + timesFile + " created successfully.");
+            log("" + "File " + timesFile + " created successfully.");
             createTimes();
           } else {
-            System.out.println("Failed to create file " + timesFile);
+            log("" + "Failed to create file " + timesFile);
           }
         } catch (IOException e) {
           e.printStackTrace();
@@ -228,7 +236,7 @@ public class autoShutdown {
 
       JSONObject apiResponseJSON = new JSONObject(responseString);
 
-      System.out.println(responseString);
+      System.out.println("" + responseString);
 
       if (response.getStatus() == 200 && !apiResponseJSON.getJSONArray("events").isEmpty()) {
 
@@ -237,14 +245,14 @@ public class autoShutdown {
         JSONArray daysArray = apiResponseJSON.getJSONObject("schedule").getJSONArray("days");
         JSONObject events = apiResponseJSON.getJSONArray("events").getJSONObject(0);
 
-        stage = Character.getNumericValue(events.getString("note").charAt(6));
+        stage = !events.isEmpty() ? Character.getNumericValue(events.getString("note").charAt(6)) : 0;
 
         String start = null, end = null;
 
         start = events.getString("start").substring(11, 16);
         end = events.getString("end").substring(11, 16);
 
-        System.out.println("end: " + end);
+        log("" + "end: " + end);
 
         JSONArray currentDayStagesArray = daysArray.getJSONObject(0).getJSONArray("stages");
         JSONArray nextDayStagesArray = daysArray.getJSONObject(1).getJSONArray("stages");
@@ -281,13 +289,11 @@ public class autoShutdown {
           parsedStart = LocalTime.parse(start, formatter);
           parsedEnd = LocalTime.parse(end, formatter);
 
-          System.out.println("gd_Parsed end: " + parsedEnd);
-          System.out.println("gd_Parsed start: " + parsedStart);
-          System.out.println(parsedTime1);
-          System.out.println(parsedTime2);
-          System.out.println(parsedTime3);
-          System.out.println(parsedTime4);
-          System.out.println(parsedTime5);
+          log("" + parsedTime1);
+          log("" + parsedTime2);
+          log("" + parsedTime3);
+          log("" + parsedTime4);
+          log("" + parsedTime5);
 
           FileReader dataReader = new FileReader("times.json");
           JSONTokener dataTokener = new JSONTokener(dataReader);
@@ -319,6 +325,7 @@ public class autoShutdown {
         } else {
           JOptionPane.showMessageDialog(null, "Error: " + response.getStatus(), "An error ocurred",
               JOptionPane.ERROR_MESSAGE);
+          log("Error: " + response.getStatus());
         }
       }
     } catch (IOException | UnirestException e) {
@@ -337,9 +344,9 @@ public class autoShutdown {
       parsedEnd = LocalTime.parse("23:59", formatter);
     }
 
-    System.out.println("Parsed start: " + parsedStart);
-    System.out.println("Parsed end: " + parsedEnd);
-    System.out.println("Time: " + time);
+    log("" + "Parsed start: " + parsedStart);
+    log("" + "Parsed end: " + parsedEnd);
+    log("" + "Time: " + time);
 
     if (time != null && ((time.isAfter(parsedStart) || time.equals(parsedStart))) && time.isBefore(parsedEnd)) {
       return time;
@@ -411,7 +418,7 @@ public class autoShutdown {
         }
 
       } else {
-        System.out.println("Waiting for " + timeBefore + " minute(s) before " + parsedTime1);
+        System.out.println("" + "Waiting for " + timeBefore + " minute(s) before " + parsedTime1);
       }
 
       if (parsedTime2 != null
@@ -427,7 +434,7 @@ public class autoShutdown {
         }
 
       } else {
-        System.out.println("Waiting for " + timeBefore + " minute(s) before " + parsedTime2);
+        System.out.println("" + "Waiting for " + timeBefore + " minute(s) before " + parsedTime2);
       }
 
       if (parsedTime3 != null
@@ -443,7 +450,7 @@ public class autoShutdown {
         }
 
       } else {
-        System.out.println("Waiting for " + timeBefore + " minute(s) before " + parsedTime3);
+        System.out.println("" + "Waiting for " + timeBefore + " minute(s) before " + parsedTime3);
       }
 
       if (parsedTime4 != null
@@ -459,7 +466,7 @@ public class autoShutdown {
         }
 
       } else {
-        System.out.println("Waiting for " + timeBefore + " minute(s) before " + parsedTime4);
+        System.out.println("" + "Waiting for " + timeBefore + " minute(s) before " + parsedTime4);
       }
 
       LocalTime beforeMidnight = LocalTime.parse("23:59", formatter);
@@ -478,7 +485,7 @@ public class autoShutdown {
         }
 
       } else {
-        System.out.println("Waiting for " + timeBefore + " minute(s) before " + parsedTime5);
+        System.out.println("" + "Waiting for " + timeBefore + " minute(s) before " + parsedTime5);
       }
 
       if ((parsedTime1 != null && now.equals(parsedTime1.minusMinutes(55)))
@@ -516,65 +523,74 @@ public class autoShutdown {
   // Update GUI with time values in "times.json"
   public static void updateGUI() {
     try {
-      FileReader timesReader = new FileReader("times.json");
-      JSONTokener timesTokener = new JSONTokener(timesReader);
-      JSONObject times = new JSONObject(timesTokener);
-
-      String[] time = new String[5];
-
-      JSONArray timesArray = times.getJSONArray("times");
-      JSONArray stageArray = times.getJSONArray("stage");
-
-      stage = stageArray.getJSONObject(0).getInt("level");
-
-      time[0] = timesArray.getJSONObject(0).get("time1").toString();
-      time[1] = timesArray.getJSONObject(0).get("time2").toString();
-      time[2] = timesArray.getJSONObject(0).get("time3").toString();
-      time[3] = timesArray.getJSONObject(0).get("time4").toString();
-      time[4] = timesArray.getJSONObject(0).get("time5").toString();
-
-      LocalTime now = LocalTime.now();
-      now = LocalTime.parse(("" + now).substring(0, 5), formatter);
-
-      if (!time[0].isBlank() && LocalTime.parse(time[0], formatter).isAfter(now)) {
-        event1 = time[0];
-        event1Label.setText(event1);
-      } else {
-        event1Label.setText(null);
-      }
-
-      if (!time[1].isBlank() && LocalTime.parse(time[1], formatter).isAfter(now)) {
-        event2 = time[1];
-        event2Label.setText(event2);
-      } else {
-        event2Label.setText(null);
-      }
-
-      if (!time[2].isBlank() && LocalTime.parse(time[2], formatter).isAfter(now)) {
-        event3 = time[2];
-        event3Label.setText(event3);
-      } else {
-        event3Label.setText(null);
-      }
-
-      if (!time[3].isBlank() && LocalTime.parse(time[3], formatter).isAfter(now)) {
-        event4 = time[3];
-        event4Label.setText(event4);
-      } else {
-        event4Label.setText(null);
-      }
-
-      if (!time[4].isBlank()) {
-        event5 = "00:00";
-        event5Label.setText(event5);
-      } else {
-        event5Label.setText(null);
-      }
 
       if (loadshedding) {
+
+        FileReader timesReader = new FileReader("times.json");
+        JSONTokener timesTokener = new JSONTokener(timesReader);
+        JSONObject times = new JSONObject(timesTokener);
+
+        String[] time = new String[5];
+
+        JSONArray timesArray = times.getJSONArray("times");
+        JSONArray stageArray = times.getJSONArray("stage");
+
+        stage = stageArray.getJSONObject(0).getInt("level");
+
+        time[0] = timesArray.getJSONObject(0).get("time1").toString();
+        time[1] = timesArray.getJSONObject(0).get("time2").toString();
+        time[2] = timesArray.getJSONObject(0).get("time3").toString();
+        time[3] = timesArray.getJSONObject(0).get("time4").toString();
+        time[4] = timesArray.getJSONObject(0).get("time5").toString();
+
+        LocalTime now = LocalTime.now();
+        now = LocalTime.parse(("" + now).substring(0, 5), formatter);
+
+        if (!time[0].isBlank() && LocalTime.parse(time[0], formatter).isAfter(now)) {
+          event1 = time[0];
+          event1Label.setText(event1);
+        } else {
+          event1Label.setText(null);
+        }
+
+        if (!time[1].isBlank() && LocalTime.parse(time[1], formatter).isAfter(now)) {
+          event2 = time[1];
+          event2Label.setText(event2);
+        } else {
+          event2Label.setText(null);
+        }
+
+        if (!time[2].isBlank() && LocalTime.parse(time[2], formatter).isAfter(now)) {
+          event3 = time[2];
+          event3Label.setText(event3);
+        } else {
+          event3Label.setText(null);
+        }
+
+        if (!time[3].isBlank() && LocalTime.parse(time[3], formatter).isAfter(now)) {
+          event4 = time[3];
+          event4Label.setText(event4);
+        } else {
+          event4Label.setText(null);
+        }
+
+        if (!time[4].isBlank()) {
+          event5 = "00:00";
+          event5Label.setText(event5);
+        } else {
+          event5Label.setText(null);
+        }
+
         eventsTitle.setText("Upcoming Events: (Stage " + stage + ")");
       } else {
-        eventsTitle.setText("No Loadshedding! :)");
+
+        eventsTitle.setText("Upcoming Events: (Stage " + stage + ")");
+        event1Label.setText("No loadshedding!");
+        event2Label.setText(null);
+        event3Label.setText(null);
+        event4Label.setText(null);
+        event5Label.setText(null);
+
       }
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -600,7 +616,7 @@ public class autoShutdown {
         createConfig();
 
       } else {
-        System.out.println("File already exists.");
+        log("" + "File already exists.");
       }
 
       try {
@@ -729,11 +745,11 @@ public class autoShutdown {
         @Override
         public void actionPerformed(ActionEvent e) {
           if (toggleButton.isSelected()) {
-            System.out.println("Button State: OFF");
+            System.out.println("" + "Button State: OFF");
             running = false;
             updateGUI();
           } else {
-            System.out.println("Button State: ON");
+            System.out.println("" + "Button State: ON");
             running = true;
           }
         }
@@ -826,7 +842,7 @@ public class autoShutdown {
 
             String selectedTime = "" + menuItem.getText().charAt(0);
             int selectedTimeInt = 0;
-            System.out.println(selectedTime);
+            log("" + selectedTime);
 
             String fileName = "config.json";
             JSONObject config = new JSONObject();
@@ -887,8 +903,8 @@ public class autoShutdown {
       events.setSize(213, 300);
       events.setLayout(new BoxLayout(events, BoxLayout.Y_AXIS)); // Set vertical layout
 
-      System.out.println(loadshedding);
-      System.out.println(stage);
+      log("" + loadshedding);
+      log("" + stage);
       eventsTitle.setText("Upcoming Events: (Stage " + stage + ")");
       JLabel spacer = new JLabel("\n");
 
@@ -1024,10 +1040,10 @@ public class autoShutdown {
                 config.put("startMinimized", startBehaviour.isSelected());
 
                 if (startup.isSelected()) {
-                  System.out.println("Creating startup link");
+                  log("" + "Creating startup link");
                   createStartupLink();
                 } else {
-                  System.out.println("Deleting startup link");
+                  log("" + "Deleting startup link");
                   deleteStartupLink();
                 }
 
@@ -1232,7 +1248,7 @@ public class autoShutdown {
         logException(e);
       }
     } else {
-      System.out.println("Opening links is not supported on this platform");
+      log("" + "Opening links is not supported on this platform");
       // You can handle this case accordingly for your application
     }
   }
@@ -1276,9 +1292,9 @@ public class autoShutdown {
       int exitCode = process.waitFor();
 
       if (exitCode == 0) {
-        System.out.println("Shortcut created successfully.");
+        log("" + "Shortcut created successfully.");
       } else {
-        System.out.println("Failed to create shortcut. Exit code: " + exitCode);
+        log("" + "Failed to create shortcut. Exit code: " + exitCode);
       }
 
       // Clean up the temporary batch file
@@ -1298,9 +1314,9 @@ public class autoShutdown {
       Path link = Paths.get(destinationDirectory);
       if (Files.exists(link)) {
         Files.delete(link);
-        System.out.println("Symbolic link deleted successfully.");
+        log("" + "Symbolic link deleted successfully.");
       } else {
-        System.out.println("Symbolic link does not exist at: " + destinationDirectory);
+        log("" + "Symbolic link does not exist at: " + destinationDirectory);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -1326,7 +1342,7 @@ public class autoShutdown {
       JSONObject data = new JSONObject(tokener);
 
       TOKEN = data.get("token").toString();
-      System.out.println("Token: " + TOKEN);
+      log("" + "Token: " + TOKEN);
 
       if ((searchQuery != null) && (searchQuery.length() > 0) && (!searchQuery.equals(" "))
           && (!searchQuery.equals(""))) {
@@ -1344,7 +1360,7 @@ public class autoShutdown {
           // Parse the JSON response
           JSONObject json = new JSONObject(areaResponse.getBody());
           JSONArray areas = json.getJSONArray("areas");
-          System.out.println("Areas response: " + areas);
+          log("" + "Areas response: " + areas);
 
           String areaName = "";
 
@@ -1352,9 +1368,9 @@ public class autoShutdown {
           if (areas.length() > 0) {
             // Get the first area ID
             areaId = areas.getJSONObject(0).getString("id");
-            System.out.println("Area ID: " + areaId);
+            log("" + "Area ID: " + areaId);
             areaName = areas.getJSONObject(0).getString("name");
-            System.out.println("Area name: " + areaName);
+            log("" + "Area name: " + areaName);
           }
 
           data.put("name", areaName);
@@ -1373,6 +1389,7 @@ public class autoShutdown {
 
         } else {
           JOptionPane.showMessageDialog(null, "An error occurred", "Error " + areaResponse.getStatus(), 0);
+          log("Error: " + areaResponse.getStatus());
         }
       }
 
@@ -1380,7 +1397,7 @@ public class autoShutdown {
       e.printStackTrace();
       logException(e);
     } catch (UnirestException e) {
-      System.out.println("Something went wrong");
+      log("Something went wrong");
       JOptionPane.showMessageDialog(null, "An error occurred", "Error", 0);
     }
   } // End of areaID
@@ -1460,9 +1477,9 @@ public class autoShutdown {
       int exitCode = process.waitFor();
 
       if (exitCode == 0) {
-        System.out.println("System shutdown initiated successfully.");
+        log("" + "System shutdown initiated successfully.");
       } else {
-        System.out.println("Failed to shut down the system.");
+        log("" + "Failed to shut down the system.");
       }
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();
@@ -1479,9 +1496,9 @@ public class autoShutdown {
       int exitCode = process.waitFor();
 
       if (exitCode == 0) {
-        System.out.println("System shutdown initiated successfully.");
+        log("" + "System shutdown initiated successfully.");
       } else {
-        System.out.println("Failed to shut down the system.");
+        log("" + "Failed to shut down the system.");
       }
     } catch (IOException | InterruptedException e) {
       e.printStackTrace();
@@ -1521,7 +1538,7 @@ public class autoShutdown {
 
     } catch (IOException e) {
       System.err.println("An error occurred while appending to the file: " + e.getMessage());
-      log("An error occurred while appending to the file: " + e.getMessage());
+      logException(e);
     }
   }
 
@@ -1549,7 +1566,7 @@ public class autoShutdown {
       writer.close();
     } catch (IOException ex) {
       System.err.println("An error occurred while appending to the file: " + ex.getMessage());
-      log("An error occurred while appending to the file: " + ex.getMessage());
+      logException(ex);
     }
   }
 
@@ -1563,15 +1580,15 @@ public class autoShutdown {
 
       if (!folder.exists()) {
         folder.mkdir();
-        System.out.println("Folder created: " + folder.getName());
+        log("" + "Folder created: " + folder.getName());
       }
 
       File file = new File(path);
 
       if (file.createNewFile()) {
-        System.out.println("File created: " + file.getName() + " in " + folder.getName());
+        log("" + "File created: " + file.getName() + " in " + folder.getName());
       } else {
-        System.out.println("File already exists in " + folder.getName());
+        log("" + "File already exists in " + folder.getName());
       }
     } catch (IOException e) {
       System.err.println("An error occurred while creating the file: " + e.getMessage());
