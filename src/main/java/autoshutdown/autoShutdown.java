@@ -38,11 +38,11 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.*;
 
-public class autoShutdown {
+public class AutoShutdown extends JDialog {
 
   static boolean testing = false;
 
-  static String versionInfo = "<html>Name:\tAuto Shutdown v2.5 <br>Version:\t2.5 <br>Updated:\t17/12/2023 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
+  static String versionInfo = "<html>Name:\tAuto Shutdown v2.6 <br>Version:\t2.6 <br>Updated:\t28/01/2024 <br> Publisher:\tVortex IT Solutions <br> GitHub:\t<a href=\"https://github.com/vortexit07/autoshutdown\">vortexit07/autoshutdown</a></html>";
 
   // Static variables
   static boolean running = true, loadshedding = true;
@@ -61,8 +61,11 @@ public class autoShutdown {
   static ProcessBuilder copyStartup = new ProcessBuilder("cmd", "/c", "mklink", "/d",
       "%appdata%/Microsoft/Windows/Start Menu/Programs/Startup" + File.separator + "Auto Shutdown", "Auto Shutdown v*");
 
+  static JFrame frame = new JFrame("Auto Shutdown");
   static TrayIcon trayIcon = new TrayIcon(
-      new ImageIcon("assets/icon.png").getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH), "Auto Shutdown");
+      new ImageIcon(AutoShutdown.class.getClassLoader().getResource("assets/icon.png")).getImage().getScaledInstance(16,
+          16, Image.SCALE_SMOOTH),
+      "Auto Shutdown");
   static final SystemTray tray = SystemTray.getSystemTray();
   static JLabel eventsTitle = new JLabel();
 
@@ -76,7 +79,12 @@ public class autoShutdown {
 
   public static void main(String[] args) {
 
+    // Create and set frame icon
+    ImageIcon icon = new ImageIcon(AutoShutdown.class.getClassLoader().getResource("assets/icon.png"));
+    frame.setIconImage(icon.getImage());
+
     createLog();
+    deleteOldLogs();
 
     try {
       if (isInternetAvailable()) {
@@ -85,13 +93,11 @@ public class autoShutdown {
 
       os = getOS();
 
-      deleteLog();
-
       SwingUtilities.invokeLater(() -> {
         createAndShowGUI();
       });
 
-      Thread.sleep(2000);
+      Thread.sleep(1000);
 
       if (!isInternetAvailable()) {
         showNotification("Auto Shutdown", "No internet connection, using previously obtained times");
@@ -136,10 +142,6 @@ public class autoShutdown {
       e.printStackTrace();
       logException(e);
     }
-  }
-
-  private static void deleteLog() {
-
   }
 
   // Check if the device has an internet connection
@@ -212,7 +214,7 @@ public class autoShutdown {
       areaID = data.getString("id");
 
       while (TOKEN.length() < 35 || TOKEN == null || TOKEN.length() > 35) {
-        TOKEN = JOptionPane.showInputDialog("Please enter your ESP API 2.0 token");
+        TOKEN = Dialog.showInputDialog(frame, "Please enter your ESP API 2.0 token");
         data.put("token", TOKEN);
 
         try {
@@ -236,7 +238,7 @@ public class autoShutdown {
 
       JSONObject apiResponseJSON = new JSONObject(responseString);
 
-      System.out.println("" + responseString);
+      System.out.println(responseString);
 
       if (response.getStatus() == 200 && !apiResponseJSON.getJSONArray("events").isEmpty()) {
 
@@ -323,8 +325,7 @@ public class autoShutdown {
         if (response.getStatus() == 200 && apiResponseJSON.getJSONArray("events").isEmpty()) {
           loadshedding = false;
         } else {
-          JOptionPane.showMessageDialog(null, "Error: " + response.getStatus(), "An error ocurred",
-              JOptionPane.ERROR_MESSAGE);
+          Dialog.showMessageDialog(frame, "Error: " + response.getStatus(), "An error ocurred", "error");
           log("Error: " + response.getStatus());
         }
       }
@@ -635,7 +636,7 @@ public class autoShutdown {
 
       String token = data.getString("token");
       while (token.length() < 35 || token == null || token.length() > 35) {
-        token = JOptionPane.showInputDialog("Please enter your ESP API 2.0 token");
+        token = Dialog.showInputDialog(frame, "Please enter your ESP API 2.0 token");
         data.put("token", token);
 
         try {
@@ -654,15 +655,10 @@ public class autoShutdown {
       int imgH = 100;
 
       // Create the main frame
-      JFrame frame = new JFrame("Auto Shutdown");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frame.setSize(800, 500);
       frame.getContentPane().setBackground(backgroundColor);
       frame.setLayout(null);
-
-      // Create and set frame icon
-      ImageIcon icon = new ImageIcon("assets/icon.png");
-      frame.setIconImage(icon.getImage());
 
       tray.add(trayIcon);
 
@@ -720,9 +716,11 @@ public class autoShutdown {
 
       // Create a toggle button with default state "on" (green)
       ImageIcon on = new ImageIcon(
-          new ImageIcon("assets/on.png").getImage().getScaledInstance(imgW, imgH, Image.SCALE_SMOOTH));
+          new ImageIcon(AutoShutdown.class.getClassLoader().getResource("assets/on.png")).getImage()
+              .getScaledInstance(imgW, imgH, Image.SCALE_SMOOTH));
       ImageIcon off = new ImageIcon(
-          new ImageIcon("assets/off.png").getImage().getScaledInstance(imgW, imgH, Image.SCALE_SMOOTH));
+          new ImageIcon(AutoShutdown.class.getClassLoader().getResource("assets/off.png")).getImage()
+              .getScaledInstance(imgW, imgH, Image.SCALE_SMOOTH));
 
       JToggleButton toggleButton = new JToggleButton(on) {
         @Override
@@ -848,12 +846,12 @@ public class autoShutdown {
             JSONObject config = new JSONObject();
 
             if (selectedTime.equals("C")) {
-              selectedTime = JOptionPane.showInputDialog("Enter time before loadshedding to shut down (minutes)");
+              selectedTime = Dialog.showInputDialog(frame, "Enter time before loadshedding to shut down (minutes)");
               selectedTimeInt = Integer.parseInt(selectedTime);
 
               if (selectedTime == null || selectedTime.isBlank() || selectedTimeInt < 1) {
                 selectedTimeInt = 1;
-                JOptionPane.showMessageDialog(null, "Invalid Value", "An error has occured", JOptionPane.ERROR_MESSAGE);
+                Dialog.showMessageDialog(frame, "Invalid Value", "An error has occured", "error");
               }
 
               try {
@@ -1020,6 +1018,28 @@ public class autoShutdown {
           int x = frame.getX() + (frame.getWidth() / 2) - dialog.getWidth() / 2;
           int y = frame.getY() + (frame.getHeight() / 2) - dialog.getHeight() / 2;
 
+          dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+          dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+              int choice = Dialog.showConfirmDialog(frame, "Do you want to save changes?", "Settings", "Discard",
+                  "Save");
+
+              System.out.println(choice);
+
+              if (choice == 0) {
+                return;
+              } else if (choice == 1) {
+                dialog.dispose();
+              } else {
+                saveButton.doClick();
+                dialog.dispose();
+              }
+              return;
+            }
+          });
+
           saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               try {
@@ -1063,7 +1083,6 @@ public class autoShutdown {
           dialog.setResizable(false);
           dialog.setVisible(true);
         }
-
       });
 
       JButton helpButton = new JButton("Help");
@@ -1334,7 +1353,7 @@ public class autoShutdown {
     try {
 
       // Enter search query
-      String searchQuery = JOptionPane.showInputDialog("Enter area to search for...");
+      String searchQuery = Dialog.showInputDialog(frame, "Enter area to search for...");
       String TOKEN = "";
       String areaId = "";
       FileReader reader = new FileReader("data.json");
@@ -1388,7 +1407,7 @@ public class autoShutdown {
           getData();
 
         } else {
-          JOptionPane.showMessageDialog(null, "An error occurred", "Error " + areaResponse.getStatus(), 0);
+          Dialog.showMessageDialog(frame, "Error: " + areaResponse.getStatus(), "An error occurred", "error");
           log("Error: " + areaResponse.getStatus());
         }
       }
@@ -1397,8 +1416,8 @@ public class autoShutdown {
       e.printStackTrace();
       logException(e);
     } catch (UnirestException e) {
-      log("Something went wrong");
-      JOptionPane.showMessageDialog(null, "An error occurred", "Error", 0);
+      log("Something went wrong" + e.getStackTrace());
+      Dialog.showMessageDialog(frame, "An error occurred", "Error", "error");
     }
   } // End of areaID
 
@@ -1580,19 +1599,55 @@ public class autoShutdown {
 
       if (!folder.exists()) {
         folder.mkdir();
-        log("" + "Folder created: " + folder.getName());
+        log("Folder created: " + folder.getName());
       }
 
       File file = new File(path);
 
       if (file.createNewFile()) {
-        log("" + "File created: " + file.getName() + " in " + folder.getName());
+        log("File created: " + file.getName() + " in " + folder.getName());
       } else {
-        log("" + "File already exists in " + folder.getName());
+        log("File already exists in " + folder.getName());
       }
     } catch (IOException e) {
       System.err.println("An error occurred while creating the file: " + e.getMessage());
       log("An error occurred while creating the file: " + e.getMessage());
+    }
+  }
+
+  private static void deleteOldLogs() {
+    String logsFolder = "logs";
+
+    File folder = new File(logsFolder);
+    if (folder.exists() && folder.isDirectory()) {
+      File[] logFiles = folder.listFiles();
+
+      if (logFiles != null) {
+        LocalDate sevenDaysAgo = LocalDate.now().minus(7, ChronoUnit.DAYS);
+
+        for (File file : logFiles) {
+          if (file.isFile()) {
+            LocalDate fileCreationDate = getFileCreationDate(file.getName());
+            if (fileCreationDate != null && fileCreationDate.isBefore(sevenDaysAgo)) {
+              if (file.delete()) {
+                log("Deleted: " + file.getName());
+              } else {
+                log("Failed to delete: " + file.getName());
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private static LocalDate getFileCreationDate(String fileName) {
+    try {
+      String datePart = fileName.substring(0, 10);
+      return LocalDate.parse(datePart);
+    } catch (Exception e) {
+      logException(e);
+      return null;
     }
   }
 
