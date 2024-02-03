@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -842,6 +843,7 @@ public class AutoShutdown extends JDialog {
             log("" + selectedTime);
 
             String fileName = "config.json";
+            JSONObject config = new JSONObject();
 
             if (selectedTime.equals("C")) {
               selectedTime = Dialog.showInputDialog(frame, "Enter time before loadshedding to shut down (minutes)");
@@ -853,9 +855,10 @@ public class AutoShutdown extends JDialog {
               }
 
               try {
-
-                UpdateJson.write(fileName, "timeBefore", selectedTimeInt);
-
+                config.put("timeBefore", selectedTimeInt);
+                FileWriter writer = new FileWriter(fileName);
+                writer.write(config.toString(4));
+                writer.close();
               } catch (IOException f) {
                 f.printStackTrace();
                 logException(f);
@@ -864,9 +867,10 @@ public class AutoShutdown extends JDialog {
             } else {
               selectedTimeInt = Integer.parseInt(selectedTime);
               try {
-
-                UpdateJson.write(fileName, "timeBefore", Integer.parseInt(selectedTime));
-
+                config.put("timeBefore", Integer.parseInt(selectedTime));
+                FileWriter writer = new FileWriter(fileName);
+                writer.write(config.toString(4));
+                writer.close();
               } catch (IOException f) {
                 f.printStackTrace();
                 logException(f);
@@ -1039,9 +1043,21 @@ public class AutoShutdown extends JDialog {
           saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               try {
+                // Read existing JSON data from the file
+                StringBuilder fileData = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new FileReader(fileName));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                  fileData.append(line).append("\n");
+                }
+                reader.close();
 
-                UpdateJson.write(fileName, "runOnStartup", startup.isSelected());
-                UpdateJson.write(fileName, "startMinimized", startBehaviour.isSelected());
+                // Parse existing JSON data
+                JSONObject config = new JSONObject(fileData.toString());
+
+                // Update the JSON with new data
+                config.put("runOnStartup", startup.isSelected());
+                config.put("startMinimized", startBehaviour.isSelected());
 
                 if (startup.isSelected()) {
                   log("" + "Creating startup link");
@@ -1051,6 +1067,10 @@ public class AutoShutdown extends JDialog {
                   deleteStartupLink();
                 }
 
+                // Write the updated JSON back to the file
+                FileWriter writer = new FileWriter(fileName);
+                writer.write(config.toString(4));
+                writer.close();
               } catch (IOException f) {
                 f.printStackTrace();
                 logException(f);
