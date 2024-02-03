@@ -4,7 +4,7 @@ Auto Shutdown is an application designed to automatically shut down the system b
 
 ## Installation
 
-Download the installer from the releases tab and run
+Download the appropriate installer (autoshutdowninstaller-jre includes the necessary JRE, recommended if you haven't previously installed Java) from the releases tab and run.
 
 ## Getting a License Key
 1. Go to the EskomSePush API page on Gumroad or click [here](https://eskomsepush.gumroad.com/l/api)
