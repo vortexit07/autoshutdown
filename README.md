@@ -1,47 +1,51 @@
-# Auto Shutdown
+# !! IMPORTANT - Repo Deprecated!!
+Looking back at this repo, now knowing so much more about programming, my code is absolutely horrendous. I have restarted the project from scratch and will be updating the new repo which you can find [here](https://github.com/vortexit07/AutoShutdown-v0.3). Please do not install this spaghetti code, I don't want your PC to get fat.
 
-Auto Shutdown is an application designed to automatically shut down the system before loadshedding begins in order to prevent damage to the system's hardware or data.
 
-## Installation
+# <del> Auto Shutdown
 
-Download the appropriate installer (autoshutdowninstaller-jre includes the necessary JRE, recommended if you haven't previously installed Java) from the releases tab and run.
+<del> Auto Shutdown is an application designed to automatically shut down the system before loadshedding begins in order to prevent damage to the system's hardware or data.
 
-## Getting a License Key
-1. Go to the EskomSePush API page on Gumroad or click [here](https://eskomsepush.gumroad.com/l/api)
-2. Make sure that the free plan is selected on the right
-3. Click "Subscribe" and proceed with the purchase (you will not be charged)
-4. On the next screen, copy your license key (should look something like XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
+## <del> Installation
 
-## Usage
+<del> Download the appropriate installer (autoshutdowninstaller-jre includes the necessary JRE, recommended if you haven't previously installed Java) from the releases tab and run.
 
-Run Auto Shutdown and input your license key in the dialog box
+## <del> Getting a License Key
+<del> 1. Go to the EskomSePush API page on Gumroad or click [here](https://eskomsepush.gumroad.com/l/api)
+<del> 2. Make sure that the free plan is selected on the right
+<del> 3. Click "Subscribe" and proceed with the purchase (you will not be charged)
+<del> 4. On the next screen, copy your license key (should look something like XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)
 
-### Navigating the UI
-![UI](https://i.imgur.com/IAEXKbd.png)
+## <del> Usage
 
-#### 1: Time selector
-Select how long before loadshedding starts that you would like to shut down the system or input a custom value (minutes)
+<del> Run Auto Shutdown and input your license key in the dialog box
 
-#### 2: Settings
-Settings menu
+### <del> Navigating the UI
+<del> ![UI](https://i.imgur.com/IAEXKbd.png)
 
-#### 3: Help
-Displays "about" section and help menu
+#### <del> 1: Time selector
+<del> Select how long before loadshedding starts that you would like to shut down the system or input a custom value (minutes)
 
-#### 4: Kill Switch
-Toggle program functionality
+#### <del> 2: Settings
+<del> Settings menu
 
-##### Green - On
+#### <del> 3: Help
+<del> Displays "about" section and help menu
 
-##### Red - Off
+#### <del> 4: Kill Switch
+<del> Toggle program functionality
 
-#### 5: Area Selection
-Displays what area's loadshedding schedule to use (Click to change)
+##### <del> Green - On
 
-#### 6: Upcoming Events
-Displays when the next shutdown time will be for the current day
+##### <del> Red - Off
 
-## Error Codes
+#### <del> 5: Area Selection
+<del> Displays what area's loadshedding schedule to use (Click to change)
+
+#### <del> 6: Upcoming Events
+<del> Displays when the next shutdown time will be for the current day
+
+## <del> Error Codes
 
 | Error Code  | Meaning |
 | ------------- | ------------- |
@@ -52,9 +56,9 @@ Displays when the next shutdown time will be for the current day
 | 5xx | Server side issue |
 
 
-## Contributing
+## <del> Contributing
 
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
+<del> Pull requests are welcome. For major changes, please open an issue first
+<del> to discuss what you would like to change.
 
-Please make sure to update tests as appropriate.
+<del> Please make sure to update tests as appropriate.
